@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/coffee-shop
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  kafka:
+    bootstrap-servers: kafka:9092
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+jwt:
+  secret:
+    key: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
