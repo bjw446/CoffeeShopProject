@@ -41,6 +41,7 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
 }
 
