@@ -52,6 +52,11 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
+      - name: Run Tests
+        run: ./gradlew test
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
       - name: Wait for MySQL
         run: |
           until mysqladmin ping -h 127.0.0.1 -proot --silent; do
