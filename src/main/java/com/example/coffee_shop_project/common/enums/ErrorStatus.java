@@ -13,6 +13,7 @@ public enum ErrorStatus {
     INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "401_INVALID_SIGNATURE", "토큰 서명이 유효하지 않습니다"),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "400_DUPLICATE_EMAIL", "이미 사용 중인 이메일입니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "404_USER_NOT_FOUND", "존재하지 않는 유저입니다"),
+    MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "404_MENU_NOT_FOUND", "존재하지 않는 메뉴입니다"),
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "404_ADMIN_NOT_FOUND", "관리자가 존재하지 않습니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "400_INVALID_PASSWORD", "비밀번호가 일치하지 않습니다"),
     ALREADY_DELETED_USER(HttpStatus.GONE, "410_ALREADY_DELETED_USER", "이미 탈퇴한 회원 입니다"),
