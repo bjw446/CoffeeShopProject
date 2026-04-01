@@ -49,6 +49,11 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}
 
+      - name: Run Tests
+        run: ./gradlew test
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
       - name: Grant execute permission
         run: chmod +x gradlew
 
