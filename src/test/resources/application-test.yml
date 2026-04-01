@@ -16,3 +16,8 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
+
+jwt:
+  secret:
+    key: test-secret-key-test-secret-key-test
+  expiration: 1800000
