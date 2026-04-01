@@ -15,7 +15,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: coffee-shop
+          MYSQL_DATABASE: coffee_shop
         ports:
           - 3306:3306
         options: >-
@@ -53,10 +53,20 @@ jobs:
         run: chmod +x gradlew
 
       - name: Wait for MySQL
-        run: sleep 20
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -proot --silent; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
 
       - name: Build with Gradle
         run: ./gradlew clean build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/libs/*.jar
 
       - name: Build Docker Image
         run: docker build -t coffee-shop-app .

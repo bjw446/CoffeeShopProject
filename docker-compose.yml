@@ -48,7 +48,7 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: local
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/coffee-shop
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/coffee_shop
       SPRING_REDIS_HOST: redis
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
