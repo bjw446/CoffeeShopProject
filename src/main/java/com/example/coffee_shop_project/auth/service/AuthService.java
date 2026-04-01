@@ -33,7 +33,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
-                .membershipNumber(MembershipNumberGenerator.generateMembershipNumber())
+                .membershipNumber(uniqueMembershipNumber())
                 .point(0L)
                 .userStatus(UserStatus.ACTIVE)
                 .userRole(UserRole.USER)
@@ -42,5 +42,13 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         return AuthResponse.from(savedUser);
+    }
+
+    private String uniqueMembershipNumber() {
+        String membershipNumber;
+        do {
+            membershipNumber = MembershipNumberGenerator.generateMembershipNumber();
+        } while (userRepository.existsByMembershipNumber(membershipNumber));
+        return membershipNumber;
     }
 }
