@@ -48,7 +48,7 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: local
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/coffee-shop
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/coffee_shop
       SPRING_REDIS_HOST: redis
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
@@ -60,6 +60,10 @@ services:
         condition: service_started
       kafka:
         condition: service_started
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      retries: 5
 
 volumes:
   mysql-data:
