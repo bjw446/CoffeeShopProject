@@ -58,6 +58,10 @@ jobs:
             echo "Waiting for MySQL..."
             sleep 5
           done
+          
+      - name: Init DB
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS coffee_shop;"
 
       - name: Build with Gradle
         run: ./gradlew clean build
