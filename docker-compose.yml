@@ -60,6 +60,10 @@ services:
         condition: service_started
       kafka:
         condition: service_started
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      retries: 5
 
 volumes:
   mysql-data:
