@@ -6,6 +6,7 @@ import com.example.coffee_shop_project.domain.order.exception.OrderException;
 import com.example.coffee_shop_project.domain.order.repository.OrderRepository;
 import com.example.coffee_shop_project.domain.payment.dto.CreatePaymentRequest;
 import com.example.coffee_shop_project.domain.payment.dto.PaymentResponse;
+import com.example.coffee_shop_project.domain.payment.dto.PaymentSuccessEvent;
 import com.example.coffee_shop_project.domain.payment.entity.Payment;
 import com.example.coffee_shop_project.domain.payment.enums.PayType;
 import com.example.coffee_shop_project.domain.payment.enums.PaymentStatus;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -61,6 +61,8 @@ public class PaymentService {
             );
         }
 
+        order.paid();
+
         Payment payment = Payment.builder()
                 .user(order.getUser())
                 .order(order)
@@ -71,17 +73,15 @@ public class PaymentService {
 
         Payment savedPayment = paymentRepository.save(payment);
 
-        order.paid();
-
-        Map<String, Object> payload = Map.of(
-                "orderId", order.getId(),
-                "userId", order.getUser() != null ? order.getUser().getId() : null,
-                "totalAmount", order.getTotalAmount()
+        PaymentSuccessEvent event = new PaymentSuccessEvent(
+                order.getId(),
+                order.getUser() != null ? order.getUser().getId() : null,
+                order.getTotalAmount()
         );
 
         String json;
         try {
-            json = objectMapper.writeValueAsString(payload);
+            json = objectMapper.writeValueAsString(event);
         } catch (Exception e) {
             throw new EventException(ErrorStatus.EVENT_NOT_FOUND);
         }

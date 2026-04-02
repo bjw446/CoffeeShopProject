@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
     private final MenuRepository menuRepository;
 
-    public MenuResponse createMenu(@Valid CreateMenuRequest request) {
+    public MenuResponse createMenu(CreateMenuRequest request) {
         Menu menu = Menu.builder()
                 .name(request.getName())
                 .price(request.getPrice())
