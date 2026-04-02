@@ -13,6 +13,7 @@ import com.example.coffee_shop_project.domain.orderitems.exception.OrderItemsExc
 import com.example.coffee_shop_project.domain.orderitems.repository.OrderItemsRepository;
 import com.example.coffee_shop_project.domain.payment.service.PaymentService;
 import com.example.coffee_shop_project.domain.user.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,12 +49,9 @@ public class OrderServiceTest {
     private PaymentService paymentService;
 
     @Test
-    void 주문_생성_성공_테스트() {
+    void 주문_생성_성공_테스트() throws JsonProcessingException {
         // given
-        CreateOrderItems items = new CreateOrderItems();
-        ReflectionTestUtils.setField(items, "menuName", "아메리카노");
-        ReflectionTestUtils.setField(items, "price", 3000L);
-        ReflectionTestUtils.setField(items, "quantity", 2L);
+        CreateOrderItems items = new CreateOrderItems("아메리카노", 3000L, 2L);
 
         CreateOrderRequest request = new CreateOrderRequest();
         ReflectionTestUtils.setField(request, "orderType", OrderType.KIOSK);
@@ -85,10 +83,7 @@ public class OrderServiceTest {
     @Test
     void 주문_생성_실패_테스트() {
         // given
-        CreateOrderItems items = new CreateOrderItems();
-        ReflectionTestUtils.setField(items, "menuName", "아메리카노");
-        ReflectionTestUtils.setField(items, "price", 3000L);
-        ReflectionTestUtils.setField(items, "quantity", 2L);
+        CreateOrderItems items = new CreateOrderItems("아메리카노", 3000L, 2L);
 
         CreateOrderRequest request = new CreateOrderRequest();
         ReflectionTestUtils.setField(request, "orderType", OrderType.KIOSK);

@@ -16,11 +16,17 @@ import com.example.coffee_shop_project.domain.pointhistory.enums.PointType;
 import com.example.coffee_shop_project.domain.pointhistory.repository.PointHistoryRepository;
 import com.example.coffee_shop_project.domain.user.entity.User;
 import com.example.coffee_shop_project.domain.user.exception.UserException;
+import com.example.coffee_shop_project.infra.outbox.entity.OutboxEvent;
+import com.example.coffee_shop_project.infra.outbox.exception.EventException;
+import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +35,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final OrderRepository orderRepository;
+    private final OutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
 
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         Order order = orderRepository.findById(request.getOrderId()).orElseThrow(
@@ -64,6 +72,31 @@ public class PaymentService {
                 .build();
 
         Payment savedPayment = paymentRepository.save(payment);
+
+        Map<String, Object> payload = Map.of(
+                "orderId", order.getId(),
+                "userId", order.getUser() != null ? order.getUser().getId() : null,
+                "totalAmount", order.getTotalAmount()
+        );
+
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(payload);
+        } catch (Exception e) {
+            throw new EventException(ErrorStatus.EVENT_NOT_FOUND);
+        }
+
+        outboxRepository.save(
+                OutboxEvent.builder()
+                        .aggregateType("PAYMENT")
+                        .aggregateId(order.getId())
+                        .eventType("PAYMENT_SUCCESS")
+                        .eventKey(UUID.randomUUID().toString())
+                        .payload(json)
+                        .status("PENDING")
+                        .build()
+        );
+
         return PaymentResponse.from(savedPayment);
     }
 

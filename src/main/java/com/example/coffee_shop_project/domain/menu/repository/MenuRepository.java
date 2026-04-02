@@ -6,10 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     Page<Menu> findByCategory(String category, Pageable pageable);
 
     @Query("SELECT m FROM MenuSales ms JOIN ms.menu m ORDER BY ms.totalQuantity DESC")
     Page<Menu> findTop10Menus(Pageable pageable);
 
+    Optional<Menu> findByName(String menuName);
 }
