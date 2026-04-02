@@ -11,6 +11,7 @@ import com.example.coffee_shop_project.domain.order.repository.OrderRepository;
 import com.example.coffee_shop_project.domain.orderitems.dto.CreateOrderItems;
 import com.example.coffee_shop_project.domain.orderitems.exception.OrderItemsException;
 import com.example.coffee_shop_project.domain.orderitems.repository.OrderItemsRepository;
+import com.example.coffee_shop_project.domain.payment.service.PaymentService;
 import com.example.coffee_shop_project.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -40,6 +43,9 @@ public class OrderServiceTest {
 
     @Mock
     private OrderItemsRepository orderItemsRepository;
+
+    @Mock
+    private PaymentService paymentService;
 
     @Test
     void 주문_생성_성공_테스트() {
@@ -146,5 +152,47 @@ public class OrderServiceTest {
 
         // when & then
         assertThrows(OrderException.class, () -> orderService.findOneOrder(5L));
+    }
+
+    @Test
+    void 주문_취소_성공_테스트() {
+        // given
+        Order order = Order.builder()
+                .user(null)
+                .orderNumber(1L)
+                .totalAmount(8000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.PAID)
+                .build();
+
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        // when
+        orderService.cancelOrder(1L);
+
+        // then
+        verify(paymentService).cancelPayment(1L);
+        assertEquals(OrderStatus.CANCELLED, order.getOrderStatus());
+    }
+
+    @Test
+    void 주문_취소_실패_테스트() {
+        // given
+        Order order = Order.builder()
+                .user(null)
+                .orderNumber(1L)
+                .totalAmount(8000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.CANCELLED)
+                .build();
+
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        // when & then
+        assertThrows(OrderException.class, () -> orderService.cancelOrder(1L));
     }
 }
