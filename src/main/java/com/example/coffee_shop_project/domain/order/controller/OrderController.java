@@ -5,6 +5,7 @@ import com.example.coffee_shop_project.common.enums.SuccessStatus;
 import com.example.coffee_shop_project.domain.order.dto.CreateOrderRequest;
 import com.example.coffee_shop_project.domain.order.dto.OrderResponse;
 import com.example.coffee_shop_project.domain.order.service.OrderService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<OrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest request) {
+    public ResponseEntity<CommonResponse<OrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest request) throws JsonProcessingException {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.success(SuccessStatus.CREATE_SUCCESS, orderService.createOrder(request)));
