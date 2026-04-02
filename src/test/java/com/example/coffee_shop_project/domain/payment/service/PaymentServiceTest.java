@@ -26,6 +26,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -33,7 +35,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -59,6 +62,12 @@ public class PaymentServiceTest {
 
     @Mock
     private ObjectMapper objectMapper;
+
+    @Mock
+    private RedissonClient redissonClient;
+
+    @Mock
+    private RLock rLock;
 
     @Test
     void 비회원_결제_취소_성공_테스트() {
@@ -182,7 +191,7 @@ public class PaymentServiceTest {
     }
 
     @Test
-    void 결제_생성_성공_테스트() {
+    void 결제_생성_성공_테스트() throws InterruptedException {
         // given
         CreatePaymentRequest request = new CreatePaymentRequest();
         ReflectionTestUtils.setField(request, "userId", 1L);
@@ -230,6 +239,10 @@ public class PaymentServiceTest {
         given(paymentRepository.save(any(Payment.class))).willReturn(payment);
 
         given(outboxRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+        given(redissonClient.getLock(anyString())).willReturn(rLock);
+        given(rLock.tryLock(anyLong(), anyLong(), any())).willReturn(true);
+        given(rLock.isHeldByCurrentThread()).willReturn(true);
 
         // when
         PaymentResponse response = paymentService.createPayment(request);
