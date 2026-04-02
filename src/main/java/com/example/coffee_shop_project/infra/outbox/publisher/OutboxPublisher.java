@@ -28,6 +28,7 @@ public class OutboxPublisher {
 
         for (OutboxEvent event : events) {
             if (event.getRetryCount() >= MAX_RETRY) {
+                log.error("Dead Event 발생: {}", event.getId());
                 continue;
             }
             try {

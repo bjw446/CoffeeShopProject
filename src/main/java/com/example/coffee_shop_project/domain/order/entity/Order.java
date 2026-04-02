@@ -74,6 +74,5 @@ public class Order extends DeletableEntity {
         }
 
         this.orderStatus = OrderStatus.PAID;
-
     }
 }

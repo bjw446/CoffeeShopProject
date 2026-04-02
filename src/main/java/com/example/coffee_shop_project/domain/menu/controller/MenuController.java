@@ -12,6 +12,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/menus")
@@ -53,16 +55,7 @@ public class MenuController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<CommonResponse<Page<MenuResponse>>> getPopularMenu(
-            @PageableDefault Pageable pageable,
-            @RequestParam(defaultValue = "1") int page
-    ) {
-        Pageable converted = PageRequest.of(
-                page - 1,
-                pageable.getPageSize(),
-                pageable.getSort()
-        );
-
-        return ResponseEntity.ok(CommonResponse.success(SuccessStatus.READ_SUCCESS, menuService.findPopularMenu(converted)));
+    public ResponseEntity<CommonResponse<List<MenuResponse>>> getPopularMenu() {
+        return ResponseEntity.ok(CommonResponse.success(SuccessStatus.READ_SUCCESS, menuService.findPopularMenu()));
     }
 }
