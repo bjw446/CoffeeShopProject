@@ -1,9 +1,7 @@
 package com.example.coffee_shop_project.domain.menu.controller;
 
 import com.example.coffee_shop_project.common.enums.ErrorStatus;
-import com.example.coffee_shop_project.domain.menu.dto.CreateMenuRequest;
 import com.example.coffee_shop_project.domain.menu.dto.MenuResponse;
-import com.example.coffee_shop_project.domain.menu.entity.Menu;
 import com.example.coffee_shop_project.domain.menu.enums.Category;
 import com.example.coffee_shop_project.domain.menu.exception.MenuException;
 import com.example.coffee_shop_project.domain.menu.service.MenuService;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;

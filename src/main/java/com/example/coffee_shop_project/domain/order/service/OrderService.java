@@ -5,7 +5,6 @@ import com.example.coffee_shop_project.domain.order.dto.CreateOrderRequest;
 import com.example.coffee_shop_project.domain.order.dto.OrderResponse;
 import com.example.coffee_shop_project.domain.order.entity.Order;
 import com.example.coffee_shop_project.domain.order.enums.OrderStatus;
-import com.example.coffee_shop_project.domain.order.enums.OrderType;
 import com.example.coffee_shop_project.domain.order.exception.OrderException;
 import com.example.coffee_shop_project.domain.order.repository.OrderRepository;
 import com.example.coffee_shop_project.domain.orderitems.dto.CreateOrderItems;
@@ -84,5 +83,14 @@ public class OrderService {
     private Long generateOrderNumber() {
         Long maxOrderNumber = orderRepository.findMaxOrderNumber();
         return maxOrderNumber + 1;
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse findOneOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> new OrderException(ErrorStatus.ORDER_NOT_FOUND)
+        );
+
+        return OrderResponse.from(order);
     }
 }
