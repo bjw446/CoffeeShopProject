@@ -22,11 +22,14 @@ import com.example.coffee_shop_project.infra.outbox.exception.EventCustomExcepti
 import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final OutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
+    private final RedissonClient redissonClient;
 
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         Order order = orderRepository.findById(request.getOrderId()).orElseThrow(
@@ -50,18 +54,34 @@ public class PaymentService {
         if (order.getUser() != null && request.getPayType() == PayType.POINT) {
             User user = order.getUser();
 
-            user.usePoint(order.getTotalAmount());
+            RLock lock = redissonClient.getLock("lock:user:usePoint:" + user.getId());
 
-            pointHistoryRepository.save(
-                    PointHistory.builder()
-                            .user(user)
-                            .point(order.getTotalAmount())
-                            .pointType(PointType.USE)
-                            .build()
-            );
+            try {
+                boolean available = lock.tryLock(5, 3, TimeUnit.SECONDS);
+
+                if (!available) {
+                    throw new PaymentException(ErrorStatus.LOCK_ACQUISITION_FAILED);
+                }
+
+                user.usePoint(order.getTotalAmount());
+
+                order.paid();
+
+                pointHistoryRepository.save(
+                        PointHistory.builder()
+                                .user(user)
+                                .point(order.getTotalAmount())
+                                .pointType(PointType.USE)
+                                .build()
+                );
+            } catch (InterruptedException e) {
+                throw new PaymentException(ErrorStatus.LOCK_INTERRUPTED);
+            } finally {
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
+            }
         }
-
-        order.paid();
 
         Payment payment = Payment.builder()
                 .user(order.getUser())

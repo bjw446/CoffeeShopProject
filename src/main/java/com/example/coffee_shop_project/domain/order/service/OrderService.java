@@ -21,11 +21,14 @@ import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class OrderService {
     private final PaymentService paymentService;
     private final OutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
+    private final RedissonClient redissonClient;
 
     public OrderResponse createOrder(CreateOrderRequest request) throws JsonProcessingException {
         User user = null;
@@ -116,8 +120,24 @@ public class OrderService {
     }
 
     private Long generateOrderNumber() {
-        Long maxOrderNumber = orderRepository.findMaxOrderNumber();
-        return maxOrderNumber + 1;
+        RLock lock = redissonClient.getLock("lock:order:orderNumber");
+
+        try {
+            boolean available = lock.tryLock(5, 3, TimeUnit.SECONDS);
+
+            if (!available) {
+                throw new OrderException(ErrorStatus.LOCK_ACQUISITION_FAILED);
+            }
+
+            Long maxOrderNumber = orderRepository.findMaxOrderNumber();
+            return maxOrderNumber + 1;
+        } catch (InterruptedException e) {
+            throw new OrderException(ErrorStatus.LOCK_INTERRUPTED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
 
     @Transactional(readOnly = true)
