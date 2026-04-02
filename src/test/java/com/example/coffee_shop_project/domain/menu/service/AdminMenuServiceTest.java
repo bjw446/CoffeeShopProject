@@ -74,6 +74,6 @@ public class AdminMenuServiceTest {
         given(menuRepository.save(any(Menu.class))).willThrow(new MenuException(ErrorStatus.ACCESS_FORBIDDEN));
 
         // when & then
-        assertThrows(RuntimeException.class, () -> menuService.createMenu(request));
+        assertThrows(MenuException.class, () -> menuService.createMenu(request));
     }
 }
