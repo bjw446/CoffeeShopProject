@@ -16,6 +16,9 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       enable-auto-commit: false
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: manual
 
   jpa:
     hibernate:

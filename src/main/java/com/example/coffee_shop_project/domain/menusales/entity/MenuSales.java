@@ -18,7 +18,7 @@ public class MenuSales {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
+    @JoinColumn(name = "menu_id", unique = true)
     private Menu menu;
 
     @NotNull
