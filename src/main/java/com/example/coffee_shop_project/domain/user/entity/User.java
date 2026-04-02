@@ -71,4 +71,8 @@ public class User extends DeletableEntity {
         this.userStatus = userStatus;
         this.userRole = userRole;
     }
+
+    public void refundPoint(Long amount) {
+        this.point += amount;
+    }
 }
