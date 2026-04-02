@@ -21,6 +21,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -28,8 +30,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -56,8 +57,14 @@ public class OrderServiceTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private RedissonClient redissonClient;
+
+    @Mock
+    private RLock rLock;
+
     @Test
-    void 주문_생성_성공_테스트() throws JsonProcessingException {
+    void 주문_생성_성공_테스트() throws JsonProcessingException, InterruptedException {
         // given
         CreateOrderItems items = new CreateOrderItems("아메리카노", 3000L, 2L);
 
@@ -78,6 +85,9 @@ public class OrderServiceTest {
         ReflectionTestUtils.setField(order, "id", 1L);
 
         given(orderRepository.save(any(Order.class))).willReturn(order);
+        given(redissonClient.getLock(anyString())).willReturn(rLock);
+        given(rLock.tryLock(anyLong(), anyLong(), any())).willReturn(true);
+        given(rLock.isHeldByCurrentThread()).willReturn(true);
 
         // when
         OrderResponse response = orderService.createOrder(request);
@@ -89,7 +99,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 주문_생성_실패_테스트() {
+    void 주문_생성_실패_테스트() throws InterruptedException {
         // given
         CreateOrderItems items = new CreateOrderItems("아메리카노", 3000L, 2L);
 
@@ -98,6 +108,9 @@ public class OrderServiceTest {
         ReflectionTestUtils.setField(request, "items", List.of(items));
 
         given(orderRepository.findMaxOrderNumber()).willReturn(0L);
+        given(redissonClient.getLock(anyString())).willReturn(rLock);
+        given(rLock.tryLock(anyLong(), anyLong(), any())).willReturn(true);
+        given(rLock.isHeldByCurrentThread()).willReturn(true);
 
         Order order = Order.builder()
                 .user(null)
