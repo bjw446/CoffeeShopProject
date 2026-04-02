@@ -6,6 +6,7 @@ import com.example.coffee_shop_project.domain.order.dto.OrderResponse;
 import com.example.coffee_shop_project.domain.order.entity.Order;
 import com.example.coffee_shop_project.domain.order.enums.OrderStatus;
 import com.example.coffee_shop_project.domain.order.enums.OrderType;
+import com.example.coffee_shop_project.domain.order.exception.OrderException;
 import com.example.coffee_shop_project.domain.order.repository.OrderRepository;
 import com.example.coffee_shop_project.domain.orderitems.dto.CreateOrderItems;
 import com.example.coffee_shop_project.domain.orderitems.exception.OrderItemsException;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -102,5 +104,47 @@ public class OrderServiceTest {
 
         // when & then
         assertThrows(OrderItemsException.class, () -> orderService.createOrder(request));
+    }
+
+    @Test
+    void 주문_조회_성공_테스트() {
+        // given
+        Order order = Order.builder()
+                .user(null)
+                .orderNumber(1L)
+                .totalAmount(8000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.PENDING)
+                .build();
+
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        // when
+        OrderResponse response = orderService.findOneOrder(1L);
+
+        // then
+        assertEquals(1L, response.getOrderNumber());
+        assertEquals(8000L, response.getTotalAmount());
+        assertEquals(OrderType.KIOSK, response.getOrderType());
+        assertEquals(OrderStatus.PENDING, response.getOrderStatus());
+    }
+
+    @Test
+    void 주문_조회_실패_테스트() {
+        // given
+        Order order = Order.builder()
+                .user(null)
+                .orderNumber(1L)
+                .totalAmount(8000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.PENDING)
+                .build();
+
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        // when & then
+        assertThrows(OrderException.class, () -> orderService.findOneOrder(5L));
     }
 }
