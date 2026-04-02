@@ -4,6 +4,7 @@ import com.example.coffee_shop_project.domain.orderitems.repository.OrderItemsRe
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 public class OrderItemsService {
     private final OrderItemsRepository orderItemsRepository;
 
+    @Transactional(readOnly = true)
     public List<String> getTop3Menus() {
         LocalDateTime start = LocalDateTime.now().minusDays(7);
 
