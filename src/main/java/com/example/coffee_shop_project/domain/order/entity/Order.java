@@ -1,8 +1,10 @@
 package com.example.coffee_shop_project.domain.order.entity;
 
 import com.example.coffee_shop_project.common.entity.DeletableEntity;
+import com.example.coffee_shop_project.common.enums.ErrorStatus;
 import com.example.coffee_shop_project.domain.order.enums.OrderStatus;
 import com.example.coffee_shop_project.domain.order.enums.OrderType;
+import com.example.coffee_shop_project.domain.order.exception.OrderException;
 import com.example.coffee_shop_project.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -46,5 +48,13 @@ public class Order extends DeletableEntity {
         this.totalAmount = totalAmount;
         this.orderType = orderType;
         this.orderStatus = orderStatus;
+    }
+
+    public void cancelOrder() {
+        if (this.orderStatus == OrderStatus.CANCELLED) {
+            throw new OrderException(ErrorStatus.ALREADY_CANCELLED_ORDER);
+        }
+
+        this.orderStatus = OrderStatus.CANCELLED;
     }
 }

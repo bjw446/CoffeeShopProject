@@ -5,15 +5,12 @@ import com.example.coffee_shop_project.common.enums.SuccessStatus;
 import com.example.coffee_shop_project.domain.order.dto.CreateOrderRequest;
 import com.example.coffee_shop_project.domain.order.dto.OrderResponse;
 import com.example.coffee_shop_project.domain.order.service.OrderService;
-import com.example.coffee_shop_project.domain.orderitems.entity.OrderItems;
-import com.example.coffee_shop_project.domain.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +29,13 @@ public class OrderController {
     public ResponseEntity<CommonResponse<OrderResponse>> getOneOrder(@PathVariable Long orderId) {
 
         return ResponseEntity.ok(CommonResponse.success(SuccessStatus.READ_SUCCESS, orderService.findOneOrder(orderId)));
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<CommonResponse<Void>> cancelOrder(@PathVariable Long orderId) {
+
+        orderService.cancelOrder(orderId);
+
+        return ResponseEntity.ok(CommonResponse.success(SuccessStatus.UPDATE_SUCCESS, null));
     }
 }

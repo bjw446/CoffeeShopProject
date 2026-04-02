@@ -11,6 +11,7 @@ import com.example.coffee_shop_project.domain.orderitems.dto.CreateOrderItems;
 import com.example.coffee_shop_project.domain.orderitems.entity.OrderItems;
 import com.example.coffee_shop_project.domain.orderitems.exception.OrderItemsException;
 import com.example.coffee_shop_project.domain.orderitems.repository.OrderItemsRepository;
+import com.example.coffee_shop_project.domain.payment.service.PaymentService;
 import com.example.coffee_shop_project.domain.user.entity.User;
 import com.example.coffee_shop_project.domain.user.exception.UserException;
 import com.example.coffee_shop_project.domain.user.repository.UserRepository;
@@ -27,6 +28,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final UserRepository userRepository;
+    private final PaymentService paymentService;
 
     public OrderResponse createOrder(CreateOrderRequest request) {
         User user = null;
@@ -92,5 +94,17 @@ public class OrderService {
         );
 
         return OrderResponse.from(order);
+    }
+
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> new OrderException(ErrorStatus.ORDER_NOT_FOUND)
+        );
+
+        if (order.getOrderStatus() == OrderStatus.PAID) {
+            paymentService.cancelPayment(order.getId());
+        }
+
+        order.cancelOrder();
     }
 }
