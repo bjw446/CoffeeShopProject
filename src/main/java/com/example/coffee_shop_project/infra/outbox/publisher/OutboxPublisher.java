@@ -3,7 +3,7 @@ package com.example.coffee_shop_project.infra.outbox.publisher;
 import com.example.coffee_shop_project.common.enums.ErrorStatus;
 import com.example.coffee_shop_project.infra.kafka.producer.KafkaEventProducer;
 import com.example.coffee_shop_project.infra.outbox.entity.OutboxEvent;
-import com.example.coffee_shop_project.infra.outbox.exception.EventException;
+import com.example.coffee_shop_project.infra.outbox.exception.EventCustomException;
 import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class OutboxPublisher {
                 String topic = switch (event.getEventType()) {
                     case "ORDER_CREATED" -> "order-events";
                     case "PAYMENT_SUCCESS" -> "payment-events";
-                    default -> throw new EventException(ErrorStatus.EVENT_TYPE_NOT_FOUND);
+                    default -> throw new EventCustomException(ErrorStatus.EVENT_TYPE_NOT_FOUND);
                 };
 
                 kafkaEventProducer.send(topic, event.getPayload());

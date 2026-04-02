@@ -9,6 +9,7 @@ import com.example.coffee_shop_project.domain.menusales.repository.MenuSalesRepo
 import com.example.coffee_shop_project.domain.order.dto.OrderCreatedEvent;
 import com.example.coffee_shop_project.domain.orderitems.dto.CreateOrderItems;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,6 @@ public class MenuSalesService {
     private final MenuRepository menuRepository;
 
     public void updateSales(OrderCreatedEvent event) {
-
         for (CreateOrderItems item : event.getItems()) {
 
             Menu menu = menuRepository.findByName(item.getMenuName())
@@ -36,7 +36,13 @@ public class MenuSalesService {
 
             menuSales.increase(item.getQuantity(), item.getPrice() * item.getQuantity());
 
-            menuSalesRepository.save(menuSales);
+            try {
+                menuSalesRepository.save(menuSales);
+            } catch (DataIntegrityViolationException e) {
+                MenuSales existing = menuSalesRepository.findByMenu(menu).orElseThrow();
+
+                existing.increase(item.getQuantity(), item.getPrice() * item.getQuantity());
+            }
         }
     }
 }

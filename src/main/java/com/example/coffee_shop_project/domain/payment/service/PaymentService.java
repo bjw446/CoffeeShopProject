@@ -18,7 +18,7 @@ import com.example.coffee_shop_project.domain.pointhistory.repository.PointHisto
 import com.example.coffee_shop_project.domain.user.entity.User;
 import com.example.coffee_shop_project.domain.user.exception.UserException;
 import com.example.coffee_shop_project.infra.outbox.entity.OutboxEvent;
-import com.example.coffee_shop_project.infra.outbox.exception.EventException;
+import com.example.coffee_shop_project.infra.outbox.exception.EventCustomException;
 import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +83,7 @@ public class PaymentService {
         try {
             json = objectMapper.writeValueAsString(event);
         } catch (Exception e) {
-            throw new EventException(ErrorStatus.EVENT_NOT_FOUND);
+            throw new EventCustomException(ErrorStatus.EVENT_NOT_FOUND);
         }
 
         outboxRepository.save(
