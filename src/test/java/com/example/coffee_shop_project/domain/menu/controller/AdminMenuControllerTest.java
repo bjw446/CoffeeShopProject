@@ -1,10 +1,8 @@
 package com.example.coffee_shop_project.domain.menu.controller;
 
-import com.example.coffee_shop_project.common.enums.ErrorStatus;
 import com.example.coffee_shop_project.domain.menu.dto.CreateMenuRequest;
 import com.example.coffee_shop_project.domain.menu.dto.MenuResponse;
 import com.example.coffee_shop_project.domain.menu.enums.Category;
-import com.example.coffee_shop_project.domain.menu.exception.MenuException;
 import com.example.coffee_shop_project.domain.menu.service.MenuService;
 import com.example.coffee_shop_project.security.SecurityConfig;
 import com.example.coffee_shop_project.security.jwt.JwtTokenProvider;

@@ -15,6 +15,7 @@ public enum ErrorStatus {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "404_USER_NOT_FOUND", "존재하지 않는 유저입니다"),
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "404_MENU_NOT_FOUND", "존재하지 않는 메뉴입니다"),
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "404_ADMIN_NOT_FOUND", "관리자가 존재하지 않습니다"),
+    ORDER_ITEMS_NOT_FOUND(HttpStatus.NOT_FOUND, "404_ORDER_ITEMS_NOT_FOUND", "주문 상품이 존재하지 않습니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "400_INVALID_PASSWORD", "비밀번호가 일치하지 않습니다"),
     ALREADY_DELETED_USER(HttpStatus.GONE, "410_ALREADY_DELETED_USER", "이미 탈퇴한 회원 입니다"),
     ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, "403_ACCESS_FORBIDDEN", "권한이 부족합니다"),
