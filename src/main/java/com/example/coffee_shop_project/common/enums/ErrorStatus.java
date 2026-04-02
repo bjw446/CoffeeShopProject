@@ -17,6 +17,8 @@ public enum ErrorStatus {
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "404_ADMIN_NOT_FOUND", "관리자가 존재하지 않습니다"),
     ORDER_ITEMS_NOT_FOUND(HttpStatus.NOT_FOUND, "404_ORDER_ITEMS_NOT_FOUND", "주문 상품이 존재하지 않습니다"),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "404_ORDER_NOT_FOUND", "주문이 존재하지 않습니다"),
+    EVENT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "404_EVENT_TYPE_NOT_FOUND", "이벤트 타입이 존재하지 않습니다"),
+    EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "404_EVENT_NOT_FOUND", "이벤트가 존재하지 않습니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "400_INVALID_PASSWORD", "비밀번호가 일치하지 않습니다"),
     ALREADY_DELETED_USER(HttpStatus.GONE, "410_ALREADY_DELETED_USER", "이미 탈퇴한 회원 입니다"),
     ALREADY_CANCELLED_ORDER(HttpStatus.GONE, "410_ALREADY_CANCELLED_ORDER", "이미 취소한 주문 입니다"),

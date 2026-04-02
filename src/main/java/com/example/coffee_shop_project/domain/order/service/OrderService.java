@@ -2,6 +2,7 @@ package com.example.coffee_shop_project.domain.order.service;
 
 import com.example.coffee_shop_project.common.enums.ErrorStatus;
 import com.example.coffee_shop_project.domain.order.dto.CreateOrderRequest;
+import com.example.coffee_shop_project.domain.order.dto.OrderCreatedEvent;
 import com.example.coffee_shop_project.domain.order.dto.OrderResponse;
 import com.example.coffee_shop_project.domain.order.entity.Order;
 import com.example.coffee_shop_project.domain.order.enums.OrderStatus;
@@ -15,11 +16,16 @@ import com.example.coffee_shop_project.domain.payment.service.PaymentService;
 import com.example.coffee_shop_project.domain.user.entity.User;
 import com.example.coffee_shop_project.domain.user.exception.UserException;
 import com.example.coffee_shop_project.domain.user.repository.UserRepository;
+import com.example.coffee_shop_project.infra.outbox.entity.OutboxEvent;
+import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +35,10 @@ public class OrderService {
     private final OrderItemsRepository orderItemsRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final OutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
 
-    public OrderResponse createOrder(CreateOrderRequest request) {
+    public OrderResponse createOrder(CreateOrderRequest request) throws JsonProcessingException {
         User user = null;
 
         if (request.getUserId() != null) {
@@ -62,6 +70,31 @@ public class OrderService {
         items.forEach(item -> item.connectOrder(savedOrder));
 
         List<OrderItems> savedOrderItems = orderItemsRepository.saveAll(items);
+
+        List<CreateOrderItems> payload = items.stream()
+                        .map(i -> new CreateOrderItems(
+                                i.getMenuName(),
+                                i.getPrice(),
+                                i.getQuantity()
+
+                        ))
+                                .toList();
+
+        OrderCreatedEvent event = new OrderCreatedEvent(
+                savedOrder.getId(),
+                payload
+        );
+
+        outboxRepository.save(
+                OutboxEvent.builder()
+                        .aggregateType("ORDER")
+                        .aggregateId(savedOrder.getId())
+                        .eventType("ORDER_CREATED")
+                        .eventKey(UUID.randomUUID().toString())
+                        .payload(objectMapper.writeValueAsString(event))
+                        .status("PENDING")
+                        .build()
+        );
 
         return OrderResponse.from(savedOrder);
     }
