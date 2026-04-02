@@ -61,8 +61,6 @@ public class PaymentService {
             );
         }
 
-        order.paid();
-
         Payment payment = Payment.builder()
                 .user(order.getUser())
                 .order(order)
@@ -72,6 +70,8 @@ public class PaymentService {
                 .build();
 
         Payment savedPayment = paymentRepository.save(payment);
+
+        order.paid();
 
         Map<String, Object> payload = Map.of(
                 "orderId", order.getId(),
