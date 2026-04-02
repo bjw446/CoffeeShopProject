@@ -35,7 +35,6 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser
     void 멤버쉽_검증_성공_테스트() throws Exception {
         // given
         String requestBody = """
@@ -65,7 +64,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 멤버쉽_검증_실패_테스트() throws Exception {
         // given
         String requestBody = """

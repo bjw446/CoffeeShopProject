@@ -44,7 +44,6 @@ public class MenuControllerTest {
     private MenuService menuService;
 
     @Test
-    @WithMockUser
     void 메뉴_전체_조회_성공_테스트() throws Exception {
         // given
         MenuResponse response = MenuResponse.builder()
@@ -68,7 +67,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 메뉴_전체_조회_실패_테스트() throws Exception {
         // given
         given(menuService.findAllMenu(any()))
@@ -82,7 +80,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 메뉴_단건_조회_성공_테스트() throws Exception {
         // given
         MenuResponse response = MenuResponse.builder()
@@ -103,7 +100,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 메뉴_단건_조회_실패_테스트() throws Exception {
         // given
         Long invalidId = 999L;
@@ -120,7 +116,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 메뉴_카테고리_조회_성공_테스트() throws Exception {
         // given
         MenuResponse response = MenuResponse.builder()
@@ -142,7 +137,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 메뉴_카테고리_조회_실패_테스트() throws Exception {
         given(menuService.findMenuByCategory(eq("COFFEE"), any()))
                 .willThrow(new MenuException(ErrorStatus.MENU_NOT_FOUND));
@@ -155,7 +149,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 인기_메뉴_조회_성공_테스트() throws Exception {
         // given
         MenuResponse response = MenuResponse.builder()
@@ -177,7 +170,6 @@ public class MenuControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 인기_메뉴_조회_실패_테스트() throws Exception {
         // given
         MenuResponse response = MenuResponse.builder()
