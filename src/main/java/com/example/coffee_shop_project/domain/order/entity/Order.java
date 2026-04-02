@@ -51,10 +51,29 @@ public class Order extends DeletableEntity {
     }
 
     public void cancelOrder() {
+        switch (this.orderStatus) {
+            case CANCELLED -> throw new OrderException(ErrorStatus.ALREADY_CANCELLED_ORDER);
+            case PAID -> throw new OrderException(ErrorStatus.ALREADY_PAID_ORDER);
+        }
+
+        this.orderStatus = OrderStatus.CANCELLED;
+    }
+
+    public void cancelOrderByAdmin() {
         if (this.orderStatus == OrderStatus.CANCELLED) {
             throw new OrderException(ErrorStatus.ALREADY_CANCELLED_ORDER);
         }
 
         this.orderStatus = OrderStatus.CANCELLED;
+    }
+
+    public void paid() {
+        switch (this.orderStatus) {
+            case CANCELLED -> throw new OrderException(ErrorStatus.ALREADY_CANCELLED_ORDER);
+            case PAID -> throw new OrderException(ErrorStatus.ALREADY_PAID_ORDER);
+        }
+
+        this.orderStatus = OrderStatus.PAID;
+
     }
 }

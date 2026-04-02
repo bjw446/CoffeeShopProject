@@ -101,10 +101,18 @@ public class OrderService {
                 () -> new OrderException(ErrorStatus.ORDER_NOT_FOUND)
         );
 
+        order.cancelOrder();
+    }
+
+    public void cancelOrderByAdmin(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> new OrderException(ErrorStatus.ORDER_NOT_FOUND)
+        );
+
         if (order.getOrderStatus() == OrderStatus.PAID) {
             paymentService.cancelPayment(order.getId());
         }
 
-        order.cancelOrder();
+        order.cancelOrderByAdmin();
     }
 }
