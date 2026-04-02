@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/menus/**").permitAll()
                         .requestMatchers("/users/membership").permitAll()
+                        .requestMatchers("/users/points/**").permitAll()
                         .requestMatchers("/payments/**").permitAll()
                         .requestMatchers("/orders/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()

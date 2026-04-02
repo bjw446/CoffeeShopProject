@@ -72,7 +72,7 @@ public class User extends DeletableEntity {
         this.userRole = userRole;
     }
 
-    public void refundPoint(Long amount) {
+    public void updatePoint(Long amount) {
         this.point += amount;
     }
 }
