@@ -38,7 +38,6 @@ public class OrderControllerTest {
     private OrderService orderService;
 
     @Test
-    @WithMockUser
     void 주문_생성_성공_테스트() throws Exception {
         // given
         String requestBody = """
@@ -78,7 +77,6 @@ public class OrderControllerTest {
     }
 
     @Test
-    @WithMockUser
     void 주문_생성_실패_테스트() throws Exception {
         // given
         String requestBody = """
