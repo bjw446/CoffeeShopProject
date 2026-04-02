@@ -47,11 +47,11 @@ public class OrderService {
             );
         }
 
-        List<OrderItems> items = convertToOrderItems(request.getItems());
-
         if (request.getItems() == null || request.getItems().isEmpty()) {
             throw new OrderItemsException(ErrorStatus.ORDER_ITEMS_NOT_FOUND);
         }
+
+        List<OrderItems> items = convertToOrderItems(request.getItems());
 
         Long orderNumber = generateOrderNumber();
 
