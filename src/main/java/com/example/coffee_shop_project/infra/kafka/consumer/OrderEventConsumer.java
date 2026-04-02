@@ -29,6 +29,5 @@ public class OrderEventConsumer {
             log.error("Kafka consume 실패", e);
             throw e;
         }
-
     }
 }

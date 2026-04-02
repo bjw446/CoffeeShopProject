@@ -71,7 +71,7 @@ public class OrderService {
 
         List<OrderItems> savedOrderItems = orderItemsRepository.saveAll(items);
 
-        List<CreateOrderItems> payload = items.stream()
+        List<CreateOrderItems> payload = savedOrderItems.stream()
                         .map(i -> new CreateOrderItems(
                                 i.getMenuName(),
                                 i.getPrice(),
