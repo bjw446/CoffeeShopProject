@@ -1,6 +1,8 @@
 package com.example.coffee_shop_project.domain.user.entity;
 
 import com.example.coffee_shop_project.common.entity.DeletableEntity;
+import com.example.coffee_shop_project.common.enums.ErrorStatus;
+import com.example.coffee_shop_project.domain.payment.exception.PaymentException;
 import com.example.coffee_shop_project.domain.user.enums.UserRole;
 import com.example.coffee_shop_project.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
@@ -74,5 +76,12 @@ public class User extends DeletableEntity {
 
     public void updatePoint(Long amount) {
         this.point += amount;
+    }
+
+    public void usePoint(Long amount) {
+        if (this.point < amount) {
+            throw new PaymentException(ErrorStatus.INSUFFICIENT_POINT);
+        }
+        this.point -= amount;
     }
 }

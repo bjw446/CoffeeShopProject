@@ -162,7 +162,7 @@ public class OrderServiceTest {
                 .orderNumber(1L)
                 .totalAmount(8000L)
                 .orderType(OrderType.KIOSK)
-                .orderStatus(OrderStatus.PAID)
+                .orderStatus(OrderStatus.PENDING)
                 .build();
 
         ReflectionTestUtils.setField(order, "id", 1L);
@@ -173,7 +173,6 @@ public class OrderServiceTest {
         orderService.cancelOrder(1L);
 
         // then
-        verify(paymentService).cancelPayment(1L);
         assertEquals(OrderStatus.CANCELLED, order.getOrderStatus());
     }
 
@@ -194,5 +193,47 @@ public class OrderServiceTest {
 
         // when & then
         assertThrows(OrderException.class, () -> orderService.cancelOrder(1L));
+    }
+
+    @Test
+    void 관리자_주문_취소_성공_테스트() {
+        // given
+        Order order = Order.builder()
+                .user(null)
+                .orderNumber(1L)
+                .totalAmount(8000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.PAID)
+                .build();
+
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        // when
+        orderService.cancelOrderByAdmin(1L);
+
+        // then
+        verify(paymentService).cancelPayment(1L);
+        assertEquals(OrderStatus.CANCELLED, order.getOrderStatus());
+    }
+
+    @Test
+    void 관리자_주문_취소_실패_테스트() {
+        // given
+        Order order = Order.builder()
+                .user(null)
+                .orderNumber(1L)
+                .totalAmount(8000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.CANCELLED)
+                .build();
+
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+
+        // when & then
+        assertThrows(OrderException.class, () -> orderService.cancelOrderByAdmin(1L));
     }
 }
