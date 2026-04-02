@@ -22,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -146,5 +148,41 @@ public class OrderControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(ErrorStatus.ORDER_NOT_FOUND.getErrorCode()))
                 .andExpect(jsonPath("$.message").value(ErrorStatus.ORDER_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void 주문_취소_성공_테스트() throws Exception {
+        // given
+        OrderResponse response = OrderResponse.builder()
+                .id(1L)
+                .orderNumber(1L)
+                .totalAmount(6000L)
+                .orderType(OrderType.KIOSK)
+                .orderStatus(OrderStatus.PENDING)
+                .build();
+
+        doNothing().when(orderService).cancelOrder(response.getId());
+
+        // when & then
+        mockMvc.perform(post("/orders/1/cancel")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+
+    }
+
+    @Test
+    void 주문_취소_실패_테스트() throws Exception {
+        // given
+        Long invalidId = 9999L;
+
+        doThrow(new OrderException(ErrorStatus.ORDER_NOT_FOUND)).when(orderService).cancelOrder(invalidId);
+
+        // when & then
+        mockMvc.perform(post("/orders/{orderId}/cancel", invalidId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

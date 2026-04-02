@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,6 +46,15 @@ public class Payment extends CreatableEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @Builder
+    public Payment(User user, Order order, BigDecimal amount, PayType payType, PaymentStatus paymentStatus) {
+        this.user = user;
+        this.order = order;
+        this.amount = amount;
+        this.payType = payType;
+        this.paymentStatus = paymentStatus;
+    }
 
     public void cancel() {
         switch (paymentStatus) {

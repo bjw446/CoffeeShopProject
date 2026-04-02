@@ -26,16 +26,18 @@ public class PaymentService {
 
         payment.cancel();
 
-        User user = payment.getUser();
+        if (payment.getUser() != null) {
+            User user = payment.getUser();
 
-        user.refundPoint(payment.getAmount().longValue());
+            user.refundPoint(payment.getAmount().longValue());
 
-        pointHistoryRepository.save(
-                PointHistory.builder()
-                        .user(user)
-                        .point(payment.getAmount().longValue())
-                        .pointType(PointType.REFUND)
-                        .build()
-        );
+            pointHistoryRepository.save(
+                    PointHistory.builder()
+                            .user(user)
+                            .point(payment.getAmount().longValue())
+                            .pointType(PointType.REFUND)
+                            .build()
+            );
+        }
     }
 }
