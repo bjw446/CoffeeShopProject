@@ -6,6 +6,7 @@ import com.example.coffee_shop_project.domain.menu.entity.Menu;
 import com.example.coffee_shop_project.domain.menu.enums.Category;
 import com.example.coffee_shop_project.domain.menu.exception.MenuException;
 import com.example.coffee_shop_project.domain.menu.repository.MenuRepository;
+import com.example.coffee_shop_project.domain.orderitems.repository.OrderItemsRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +37,9 @@ public class MenuServiceTest {
 
     @InjectMocks
     private MenuService menuService;
+
+    @Mock
+    private OrderItemsRepository orderItemsRepository;
 
     @Test
     void 메뉴_전체_조회_성공_테스트() {
@@ -145,31 +151,26 @@ public class MenuServiceTest {
     @Test
     void 인기_메뉴_조회_성공_테스트() {
         // given
-        Menu menu = Menu.builder()
-                .name("아메리카노")
-                .price(3000L)
-                .category(Category.COFFEE)
-                .build();
+        Object[] row = new Object[]{1L, "아메리카노", 3000L, Category.COFFEE};
+        List<Object[]> results = new ArrayList<>();
+        results.add(row);
 
-        ReflectionTestUtils.setField(menu, "id", 1L);
-
-        Page<Menu> page = new PageImpl<>(List.of(menu));
-        given(menuRepository.findTop10Menus(any())).willReturn(page);
+        given(orderItemsRepository.findTopMenus(any(), any())).willReturn(results);
 
         // when
-        Page<MenuResponse> result = menuService.findPopularMenu(PageRequest.of(0, 10));
+        List<MenuResponse> result = menuService.findPopularMenu();
 
         // then
-        assertEquals("아메리카노", result.getContent().get(0).getName());
+        assertEquals("아메리카노", result.get(0).getName());
     }
 
     @Test
     void 인기_메뉴_조회_실패_테스트() {
         // given
-        given(menuRepository.findTop10Menus(any()))
+        given(orderItemsRepository.findTopMenus(any(), any()))
                 .willThrow(new MenuException(ErrorStatus.MENU_NOT_FOUND));
 
         // when & then
-        assertThrows(MenuException.class, () -> menuService.findPopularMenu(PageRequest.of(0, 10)));
+        assertThrows(MenuException.class, () -> menuService.findPopularMenu());
     }
 }

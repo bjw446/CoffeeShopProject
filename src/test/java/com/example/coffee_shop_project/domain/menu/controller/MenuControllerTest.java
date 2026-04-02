@@ -155,15 +155,14 @@ public class MenuControllerTest {
                 .category(Category.LATTE)
                 .build();
 
-        Page<MenuResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 10), 1);
-        given(menuService.findPopularMenu(any())).willReturn(page);
+        given(menuService.findPopularMenu()).willReturn(List.of(response));
 
         // when & then
         mockMvc.perform(get("/menus/popular")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content[0].name").value("카페라떼"));
+                .andExpect(jsonPath("$.data[0].name").value("카페라떼"));
     }
 
     @Test
@@ -176,9 +175,7 @@ public class MenuControllerTest {
                 .category(Category.LATTE)
                 .build();
 
-        Page<MenuResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 10), 1);
-
-        given(menuService.findPopularMenu(any()))
+        given(menuService.findPopularMenu())
                 .willThrow(new MenuException(ErrorStatus.MENU_NOT_FOUND));
 
         // when & then

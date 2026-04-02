@@ -13,7 +13,9 @@ import com.example.coffee_shop_project.domain.orderitems.exception.OrderItemsExc
 import com.example.coffee_shop_project.domain.orderitems.repository.OrderItemsRepository;
 import com.example.coffee_shop_project.domain.payment.service.PaymentService;
 import com.example.coffee_shop_project.domain.user.repository.UserRepository;
+import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,6 +49,12 @@ public class OrderServiceTest {
 
     @Mock
     private PaymentService paymentService;
+
+    @Mock
+    private OutboxRepository outboxRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Test
     void 주문_생성_성공_테스트() throws JsonProcessingException {

@@ -18,6 +18,9 @@ import com.example.coffee_shop_project.domain.user.entity.User;
 import com.example.coffee_shop_project.domain.user.enums.UserRole;
 import com.example.coffee_shop_project.domain.user.enums.UserStatus;
 import com.example.coffee_shop_project.domain.user.exception.UserException;
+import com.example.coffee_shop_project.infra.outbox.entity.OutboxEvent;
+import com.example.coffee_shop_project.infra.outbox.repository.OutboxRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,6 +53,12 @@ public class PaymentServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private OutboxRepository outboxRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Test
     void 비회원_결제_취소_성공_테스트() {
@@ -214,9 +223,13 @@ public class PaymentServiceTest {
 
         ReflectionTestUtils.setField(payment, "id", 1L);
 
+
+
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         given(paymentRepository.save(any(Payment.class))).willReturn(payment);
+
+        given(outboxRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         PaymentResponse response = paymentService.createPayment(request);
