@@ -1,8 +1,11 @@
 package com.example.coffee_shop_project.domain.user.service;
 
+import com.example.coffee_shop_project.common.enums.ErrorStatus;
 import com.example.coffee_shop_project.domain.user.dto.MembershipRequest;
 import com.example.coffee_shop_project.domain.user.dto.MembershipResponse;
+import com.example.coffee_shop_project.domain.user.dto.ChargePointRequest;
 import com.example.coffee_shop_project.domain.user.entity.User;
+import com.example.coffee_shop_project.domain.user.exception.UserException;
 import com.example.coffee_shop_project.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,5 +34,15 @@ public class UserService {
         User existsUser = user.get();
 
         return MembershipResponse.isMember(existsUser);
+    }
+
+    public MembershipResponse chargePoint(ChargePointRequest request) {
+        User user = userRepository.findByMembershipNumber(request.getMembershipNumber()).orElseThrow(
+                () -> new UserException(ErrorStatus.USER_NOT_FOUND)
+        );
+
+        user.updatePoint(request.getPoint());
+
+        return MembershipResponse.isMember(user);
     }
 }

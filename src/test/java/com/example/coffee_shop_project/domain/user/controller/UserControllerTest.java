@@ -1,7 +1,10 @@
 package com.example.coffee_shop_project.domain.user.controller;
 
+import com.example.coffee_shop_project.common.enums.ErrorStatus;
 import com.example.coffee_shop_project.domain.user.dto.MembershipRequest;
 import com.example.coffee_shop_project.domain.user.dto.MembershipResponse;
+import com.example.coffee_shop_project.domain.user.dto.ChargePointRequest;
+import com.example.coffee_shop_project.domain.user.exception.UserException;
 import com.example.coffee_shop_project.domain.user.service.UserService;
 import com.example.coffee_shop_project.security.SecurityConfig;
 import com.example.coffee_shop_project.security.jwt.JwtTokenProvider;
@@ -89,5 +92,57 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.data.member").value(false))
                 .andExpect(jsonPath("$.data.name").isEmpty())
                 .andExpect(jsonPath("$.data.point").isEmpty());
+    }
+
+    @Test
+    void 포인트_충전_성공_테스트() throws Exception {
+        // given
+        String requestBody = """
+                {
+                    "membershipNumber": "1234-5678-1234-5678",
+                    "point": 10000
+                }
+                """;
+
+        MembershipResponse response = MembershipResponse.builder()
+                .isMember(true)
+                .name("테스트")
+                .point(10200L)
+                .build();
+
+        given(userService.chargePoint(any(ChargePointRequest.class))).willReturn(response);
+
+        // when & then
+        mockMvc.perform(post("/users/points/charge")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200_CHARGE_SUCCESS"))
+                .andExpect(jsonPath("$.data.member").value(true))
+                .andExpect(jsonPath("$.data.name").value("테스트"))
+                .andExpect(jsonPath("$.data.point").value(10200L));
+    }
+
+    @Test
+    void 포인트_충전_실패_테스트() throws Exception {
+        // given
+        String requestBody = """
+                {
+                    "membershipNumber": "1234-5678-1234-5678",
+                    "point": 10000
+                }
+                """;
+
+        given(userService.chargePoint(any(ChargePointRequest.class))).willThrow(new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        // when & then
+        mockMvc.perform(post("/users/points/charge")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("404_USER_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"));
     }
 }

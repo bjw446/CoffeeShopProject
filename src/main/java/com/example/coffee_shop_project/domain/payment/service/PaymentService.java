@@ -29,7 +29,7 @@ public class PaymentService {
         if (payment.getUser() != null) {
             User user = payment.getUser();
 
-            user.refundPoint(payment.getAmount().longValue());
+            user.updatePoint(payment.getAmount().longValue());
 
             pointHistoryRepository.save(
                     PointHistory.builder()
