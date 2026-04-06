@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.gradle
+.idea
+
+# OS
+.DS_Store
+
+# 민감정보
+.env
+
+# 빌드 산출물
+build/
+!build/libs/*.jar
+
+# 로그
+*.log
+
+# 기타
+node_modules
