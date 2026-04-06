@@ -31,6 +31,7 @@ public enum ErrorStatus {
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST, "400_INSUFFICIENT_POINT", "잔액이 부족합니다"),
     KAFKA_SEND_ERROR(HttpStatus.BAD_REQUEST, "400_KAFKA_SEND_ERROR", "Kafka 전송이 실패했습니다."),
     KAFKA_CONSUME_ERROR(HttpStatus.BAD_REQUEST, "400_KAFKA_CONSUME_ERROR", "Kafka Consume이 실패했습니다."),
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "502_EXTERNAL_API_ERROR", "외부 API 호출에 실패했습니다."),
     LOCK_ACQUISITION_FAILED(HttpStatus.CONFLICT, "409_LOCK_ACQUISITION_FAILED", "다른 사용자가 이미 요청 중입니다"),
     LOCK_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "408_LOCK_TIMEOUT", "요청이 많아 처리가 지연되었습니다. 잠시 후 다시 시도해주세요"),
     LOCK_RELEASE_FAILED(HttpStatus.BAD_REQUEST, "400_LOCK_RELEASE_FAILED", "요청 처리 중 문제가 발생했습니다. 다시 시도해주세요"),
